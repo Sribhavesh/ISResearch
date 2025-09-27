@@ -108,6 +108,10 @@
 
 ## 📝 利用方法
 
+### 🌐 オンライン版（推奨）
+**GitHub Pages**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
+
+### 💻 ローカル版
 1. `tam_technology_mapping.html`をWebブラウザで開く
 2. 各技術のバブルにマウスオーバーで詳細情報を表示
 3. ズーム・パン操作で詳細な位置関係を確認

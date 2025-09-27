@@ -1,5 +1,10 @@
 # ISResearch - 情報システム研究プロジェクト
 
+## 🚀 クイックナビゲーション
+- 📊 **[TAM技術マッピング（インタラクティブ）](http://kklab.mobi/ISResearch/tam_technology_mapping.html)** - メインの可視化資料
+- 📁 **[ローカル版ファイル](tam_technology_mapping.html)** - オフラインでの閲覧用
+- 🌐 **[プロジェクト全体](http://kklab.mobi/ISResearch/)** - 研究概要・ドキュメント
+
 ## 📋 プロジェクト概要
 
 このリポジトリは、最新テクノロジーの受容と普及に関する研究資料を含む情報システム研究プロジェクトです。主な研究テーマは、技術受容モデル（TAM: Technology Acceptance Model）を用いた現代テクノロジーの分析と評価です。
@@ -8,13 +13,24 @@
 
 ### 📄 主要資料
 
-#### `tam_technology_mapping.html`
+#### 📊 TAM技術マッピング可視化
+**ファイル**: [`tam_technology_mapping.html`](tam_technology_mapping.html)  
+**🌐 オンライン版**: [http://kklab.mobi/ISResearch/tam_technology_mapping.html](http://kklab.mobi/ISResearch/tam_technology_mapping.html)
+
 - **種類**: インタラクティブな可視化資料
 - **内容**: 技術受容モデル（TAM）の2軸分析によるテクノロジーマッピング
 - **技術**: HTML5 + Plotly.js による動的チャート
 - **分析軸**:
   - X軸: 知覚された有用性（Perceived Usefulness）
   - Y軸: 知覚された使いやすさ（Perceived Ease of Use）
+
+#### 📋 プロジェクト概要・ドキュメント
+**ファイル**: [`README.md`](README.md)  
+**🌐 オンライン版**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
+
+- **種類**: プロジェクト全体の概要・ドキュメント
+- **内容**: 研究背景、方法論、技術仕様、更新履歴
+- **形式**: Markdown形式（GitHub Pages自動表示）
 
 #### 分析対象テクノロジー（6カテゴリー、30+技術）
 
@@ -98,6 +114,16 @@
   - レスポンシブデザインの実装
   - 4象限分析フレームワークの導入
 
+- **commit e9e9243**: README追加・GitHub Pages公開
+  - 包括的なプロジェクトドキュメントの作成
+  - GitHub Pagesによる公開サイト構築
+  - リポジトリ情報・トピックの設定
+
+- **commit da025d0**: ナビゲーション改善
+  - README内の直接リンク設定
+  - クイックアクセステーブルの追加
+  - オンライン版・ローカル版の使い分け明記
+
 ### 今後の予定アップデート
 - **Q4 2025**: 技術評価データの更新
 - **Q1 2026**: 新興技術カテゴリーの追加
@@ -108,14 +134,22 @@
 
 ## 📝 利用方法
 
+### 🚀 クイックアクセス
+| 資料名 | オンライン版 | ローカル版 | 説明 |
+|--------|-------------|-----------|------|
+| **TAM技術マッピング** | [🌐 表示](http://kklab.mobi/ISResearch/tam_technology_mapping.html) | [📁 ファイル](tam_technology_mapping.html) | インタラクティブ可視化 |
+| **プロジェクト概要** | [🌐 表示](http://kklab.mobi/ISResearch/) | [📁 ファイル](README.md) | 研究ドキュメント |
+
 ### 🌐 オンライン版（推奨）
-**GitHub Pages**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
+- **メインサイト**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
+- **技術マッピング**: [http://kklab.mobi/ISResearch/tam_technology_mapping.html](http://kklab.mobi/ISResearch/tam_technology_mapping.html)
 
 ### 💻 ローカル版
-1. `tam_technology_mapping.html`をWebブラウザで開く
-2. 各技術のバブルにマウスオーバーで詳細情報を表示
-3. ズーム・パン操作で詳細な位置関係を確認
-4. 凡例を参照してカテゴリー別の技術動向を把握
+1. リポジトリをクローン: `git clone https://github.com/kkawailab/ISResearch.git`
+2. `tam_technology_mapping.html`をWebブラウザで開く
+3. 各技術のバブルにマウスオーバーで詳細情報を表示
+4. ズーム・パン操作で詳細な位置関係を確認
+5. 凡例を参照してカテゴリー別の技術動向を把握
 
 ## 📞 お問い合わせ
 

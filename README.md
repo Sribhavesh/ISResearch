@@ -2,6 +2,7 @@
 
 ## 🚀 クイックナビゲーション
 - 📊 **[TAM技術マッピング（インタラクティブ）](http://kklab.mobi/ISResearch/tam_technology_mapping.html)** - メインの可視化資料
+- 🤖 **[TAMエージェントベースシミュレーション](http://kklab.mobi/ISResearch/tam_agent_simulation.html)** - 技術採用プロセスのシミュレーション
 - 📁 **[ローカル版ファイル](tam_technology_mapping.html)** - オフラインでの閲覧用
 - 🌐 **[プロジェクト全体](http://kklab.mobi/ISResearch/)** - 研究概要・ドキュメント
 
@@ -14,7 +15,7 @@
 ### 📄 主要資料
 
 #### 📊 TAM技術マッピング可視化
-**ファイル**: [`tam_technology_mapping.html`](tam_technology_mapping.html)  
+**ファイル**: [`tam_technology_mapping.html`](tam_technology_mapping.html)
 **🌐 オンライン版**: [http://kklab.mobi/ISResearch/tam_technology_mapping.html](http://kklab.mobi/ISResearch/tam_technology_mapping.html)
 
 - **種類**: インタラクティブな可視化資料
@@ -24,8 +25,22 @@
   - X軸: 知覚された有用性（Perceived Usefulness）
   - Y軸: 知覚された使いやすさ（Perceived Ease of Use）
 
+#### 🤖 TAMエージェントベースシミュレーション
+**ファイル**: [`tam_agent_simulation.html`](tam_agent_simulation.html)
+**🌐 オンライン版**: [http://kklab.mobi/ISResearch/tam_agent_simulation.html](http://kklab.mobi/ISResearch/tam_agent_simulation.html)
+**📄 説明文書**: [`abm.md`](abm.md)
+
+- **種類**: インタラクティブなシミュレーション
+- **内容**: TAM理論に基づくエージェントベースモデルで技術採用プロセスを可視化
+- **技術**: HTML5 + Canvas による動的シミュレーション
+- **主要機能**:
+  - 個別エージェントの意思決定モデル
+  - 社会的影響のネットワーク効果
+  - S字カーブの動的生成
+  - パラメータ調整による実験
+
 #### 📋 プロジェクト概要・ドキュメント
-**ファイル**: [`README.md`](README.md)  
+**ファイル**: [`README.md`](README.md)
 **🌐 オンライン版**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
 
 - **種類**: プロジェクト全体の概要・ドキュメント
@@ -105,6 +120,13 @@
 
 ## 🔄 更新履歴
 
+### 2025年9月28日 - 最新更新
+- **ABMシミュレーション追加**:
+  - TAMエージェントベースモデルの実装
+  - インタラクティブなシミュレーション環境構築
+  - 技術採用プロセスの動的可視化
+  - abm.md文書の追加
+
 ### 2025年9月28日（初回リリース）
 - **commit 0cc98ab**: プロジェクト初期化
   - TAM技術マッピング可視化システムの実装
@@ -138,18 +160,28 @@
 | 資料名 | オンライン版 | ローカル版 | 説明 |
 |--------|-------------|-----------|------|
 | **TAM技術マッピング** | [🌐 表示](http://kklab.mobi/ISResearch/tam_technology_mapping.html) | [📁 ファイル](tam_technology_mapping.html) | インタラクティブ可視化 |
+| **TAMエージェントシミュレーション** | [🌐 表示](http://kklab.mobi/ISResearch/tam_agent_simulation.html) | [📁 ファイル](tam_agent_simulation.html) | 技術採用シミュレーション |
+| **ABMドキュメント** | - | [📁 ファイル](abm.md) | シミュレーション説明 |
 | **プロジェクト概要** | [🌐 表示](http://kklab.mobi/ISResearch/) | [📁 ファイル](README.md) | 研究ドキュメント |
 
 ### 🌐 オンライン版（推奨）
 - **メインサイト**: [http://kklab.mobi/ISResearch/](http://kklab.mobi/ISResearch/)
 - **技術マッピング**: [http://kklab.mobi/ISResearch/tam_technology_mapping.html](http://kklab.mobi/ISResearch/tam_technology_mapping.html)
+- **エージェントシミュレーション**: [http://kklab.mobi/ISResearch/tam_agent_simulation.html](http://kklab.mobi/ISResearch/tam_agent_simulation.html)
 
 ### 💻 ローカル版
 1. リポジトリをクローン: `git clone https://github.com/kkawailab/ISResearch.git`
-2. `tam_technology_mapping.html`をWebブラウザで開く
-3. 各技術のバブルにマウスオーバーで詳細情報を表示
-4. ズーム・パン操作で詳細な位置関係を確認
-5. 凡例を参照してカテゴリー別の技術動向を把握
+2. 各HTMLファイルをWebブラウザで開く:
+   - `tam_technology_mapping.html`: 技術マッピング可視化
+   - `tam_agent_simulation.html`: エージェントベースシミュレーション
+3. 技術マッピングの操作:
+   - 各技術のバブルにマウスオーバーで詳細情報を表示
+   - ズーム・パン操作で詳細な位置関係を確認
+   - 凡例を参照してカテゴリー別の技術動向を把握
+4. シミュレーションの操作:
+   - パラメータスライダーで条件を調整
+   - スタート/ストップボタンでシミュレーション制御
+   - リアルタイムグラフで採用率を監視
 
 ## 📞 お問い合わせ
 

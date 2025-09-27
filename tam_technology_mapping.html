@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAM 2軸モデル：最新テクノロジーのマッピング</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        #plotDiv {
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .legend-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .legend-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .quadrant-desc {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .quadrant {
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            border: 2px solid;
+        }
+        .q1 { border-color: #27ae60; background: #eafaf1; }
+        .q2 { border-color: #f39c12; background: #fef5e7; }
+        .q3 { border-color: #e74c3c; background: #fdedec; }
+        .q4 { border-color: #3498db; background: #ebf5fb; }
+        .quadrant h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        .quadrant p {
+            margin: 0;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.4;
+        }
+        .tech-categories {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .category-icon {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .insights {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            border-radius: 8px;
+        }
+        .insights h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 16px;
+        }
+        .insights ul {
+            margin: 10px 0;
+            padding-left: 25px;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>技術受容モデル（TAM）による最新テクノロジーマッピング</h1>
+        <p class="subtitle">知覚された有用性（Perceived Usefulness）× 知覚された使いやすさ（Perceived Ease of Use）</p>
+        
+        <div id="plotDiv"></div>
+        
+        <div class="legend-container">
+            <div class="legend-title">📊 象限の解釈</div>
+            <div class="quadrant-desc">
+                <div class="quadrant q1">
+                    <h3>第1象限：スター技術</h3>
+                    <p>高い有用性と使いやすさを併せ持つ。急速な普及が期待され、主流技術となる可能性が高い。</p>
+                </div>
+                <div class="quadrant q2">
+                    <h3>第2象限：潜在的優良技術</h3>
+                    <p>有用性は高いがUI/UXの改善が必要。技術的ハードルを克服すれば大きな成長が見込める。</p>
+                </div>
+                <div class="quadrant q3">
+                    <h3>第3象限：ニッチ技術</h3>
+                    <p>有用性と使いやすさ共に課題あり。特定用途や専門分野での活用に限定される可能性。</p>
+                </div>
+                <div class="quadrant q4">
+                    <h3>第4象限：過渡期技術</h3>
+                    <p>使いやすいが有用性の実証が不十分。キラーアプリケーションの発見が普及の鍵。</p>
+                </div>
+            </div>
+            
+            <div class="legend-title">🏷️ テクノロジーカテゴリー</div>
+            <div class="tech-categories">
+                <span class="category-badge" style="background: #e8f5e9;">
+                    <span class="category-icon" style="background: #4CAF50;"></span>
+                    AI・機械学習
+                </span>
+                <span class="category-badge" style="background: #e3f2fd;">
+                    <span class="category-icon" style="background: #2196F3;"></span>
+                    XR技術
+                </span>
+                <span class="category-badge" style="background: #fce4ec;">
+                    <span class="category-icon" style="background: #E91E63;"></span>
+                    ブロックチェーン
+                </span>
+                <span class="category-badge" style="background: #f3e5f5;">
+                    <span class="category-icon" style="background: #9C27B0;"></span>
+                    量子技術
+                </span>
+                <span class="category-badge" style="background: #fff3e0;">
+                    <span class="category-icon" style="background: #FF9800;"></span>
+                    IoT・ロボティクス
+                </span>
+                <span class="category-badge" style="background: #e0f2f1;">
+                    <span class="category-icon" style="background: #009688;"></span>
+                    バイオ・ヘルスケア
+                </span>
+            </div>
+        </div>
+        
+        <div class="insights">
+            <h3>📈 主要な洞察</h3>
+            <ul>
+                <li><strong>生成AI（ChatGPT、Claude等）</strong>は最も成功した位置にあり、高い有用性と改善された使いやすさにより急速に普及</li>
+                <li><strong>量子コンピューティング</strong>は潜在的価値は極めて高いが、技術的複雑性により実用化に課題</li>
+                <li><strong>Apple Vision Pro等のXR技術</strong>は使いやすさは向上したが、明確な用途の確立が課題</li>
+                <li><strong>自動運転技術</strong>は有用性は明確だが、技術的・規制的ハードルにより普及速度に制約</li>
+                <li><strong>Web3技術</strong>は概念的価値と実用性のギャップが依然として大きい</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>※ 各技術の位置は2024-2025年時点での一般的な評価に基づく推定値です。</p>
+            <p>実際の受容度は、産業分野、地域、ユーザー層により大きく異なる場合があります。</p>
+        </div>
+    </div>
+
+    <script>
+        // テクノロジーデータ
+        const technologies = [
+            // AI・機械学習（緑系）
+            {name: 'ChatGPT/Claude', x: 8.5, y: 9.2, size: 45, color: '#4CAF50', category: 'AI'},
+            {name: 'GitHub Copilot', x: 7.8, y: 8.5, size: 35, color: '#4CAF50', category: 'AI'},
+            {name: '画像生成AI', x: 6.5, y: 7.8, size: 30, color: '#4CAF50', category: 'AI'},
+            {name: '音声アシスタント', x: 8.2, y: 6.5, size: 28, color: '#66BB6A', category: 'AI'},
+            {name: 'AI動画生成', x: 5.5, y: 5.8, size: 22, color: '#66BB6A', category: 'AI'},
+            {name: 'AutoML', x: 6.2, y: 6.8, size: 20, color: '#81C784', category: 'AI'},
+            
+            // XR技術（青系）
+            {name: 'Apple Vision Pro', x: 7.0, y: 5.5, size: 28, color: '#2196F3', category: 'XR'},
+            {name: 'Meta Quest 3', x: 6.8, y: 6.0, size: 25, color: '#2196F3', category: 'XR'},
+            {name: 'AR グラス', x: 5.8, y: 5.2, size: 20, color: '#42A5F5', category: 'XR'},
+            {name: 'ホログラフィック', x: 3.5, y: 7.5, size: 18, color: '#64B5F6', category: 'XR'},
+            
+            // ブロックチェーン（ピンク系）
+            {name: 'CBDC', x: 4.5, y: 7.8, size: 22, color: '#E91E63', category: 'Blockchain'},
+            {name: 'NFT', x: 5.2, y: 3.8, size: 18, color: '#EC407A', category: 'Blockchain'},
+            {name: 'DeFi', x: 4.2, y: 5.5, size: 20, color: '#F06292', category: 'Blockchain'},
+            {name: 'Web3', x: 4.8, y: 3.5, size: 16, color: '#F48FB1', category: 'Blockchain'},
+            
+            // 量子技術（紫系）
+            {name: '量子コンピューティング', x: 2.8, y: 9.5, size: 25, color: '#9C27B0', category: 'Quantum'},
+            {name: '量子暗号', x: 3.5, y: 8.2, size: 18, color: '#AB47BC', category: 'Quantum'},
+            {name: '量子センサー', x: 3.2, y: 7.0, size: 15, color: '#BA68C8', category: 'Quantum'},
+            
+            // IoT・ロボティクス（オレンジ系）
+            {name: 'スマートホーム', x: 7.5, y: 7.2, size: 30, color: '#FF9800', category: 'IoT'},
+            {name: '自動運転車', x: 4.5, y: 9.0, size: 32, color: '#FF9800', category: 'IoT'},
+            {name: '産業用ロボット', x: 6.8, y: 7.5, size: 28, color: '#FFA726', category: 'IoT'},
+            {name: 'ドローン配送', x: 5.2, y: 6.5, size: 20, color: '#FFB74D', category: 'IoT'},
+            {name: 'ヒューマノイド', x: 3.8, y: 8.5, size: 22, color: '#FFCC80', category: 'IoT'},
+            
+            // バイオ・ヘルスケア（ティール系）
+            {name: 'mRNA技術', x: 7.2, y: 8.8, size: 28, color: '#009688', category: 'Bio'},
+            {name: '遠隔医療', x: 7.8, y: 7.5, size: 26, color: '#009688', category: 'Bio'},
+            {name: 'CRISPR', x: 3.2, y: 9.2, size: 24, color: '#26A69A', category: 'Bio'},
+            {name: 'デジタルツイン医療', x: 4.5, y: 6.8, size: 20, color: '#4DB6AC', category: 'Bio'},
+            {name: 'ブレインチップ', x: 2.5, y: 8.8, size: 18, color: '#80CBC4', category: 'Bio'},
+        ];
+
+        // スキャッターチャートの作成
+        const trace = {
+            x: technologies.map(t => t.x),
+            y: technologies.map(t => t.y),
+            text: technologies.map(t => t.name),
+            mode: 'markers+text',
+            marker: {
+                size: technologies.map(t => t.size),
+                color: technologies.map(t => t.color),
+                opacity: 0.7,
+                line: {
+                    color: 'white',
+                    width: 2
+                }
+            },
+            textposition: 'middle center',
+            textfont: {
+                size: 10,
+                color: 'white',
+                family: 'Arial, sans-serif',
+                weight: 'bold'
+            },
+            hovertemplate: '<b>%{text}</b><br>' +
+                          '有用性: %{x:.1f}/10<br>' +
+                          '使いやすさ: %{y:.1f}/10<br>' +
+                          '<extra></extra>',
+            type: 'scatter'
+        };
+
+        // 象限を示す背景
+        const layout = {
+            title: false,
+            xaxis: {
+                title: {
+                    text: '知覚された有用性（Perceived Usefulness）→',
+                    font: {size: 14, color: '#2c3e50'}
+                },
+                range: [0, 10],
+                tickvals: [0, 2, 4, 6, 8, 10],
+                ticktext: ['0<br>低', '2', '4', '6', '8', '10<br>高'],
+                showgrid: true,
+                gridcolor: '#e0e0e0',
+                gridwidth: 1,
+                zeroline: false
+            },
+            yaxis: {
+                title: {
+                    text: '知覚された使いやすさ（Perceived Ease of Use）→',
+                    font: {size: 14, color: '#2c3e50'}
+                },
+                range: [0, 10],
+                tickvals: [0, 2, 4, 6, 8, 10],
+                ticktext: ['0<br>低', '2', '4', '6', '8', '10<br>高'],
+                showgrid: true,
+                gridcolor: '#e0e0e0',
+                gridwidth: 1,
+                zeroline: false
+            },
+            shapes: [
+                // 縦線（x=5）
+                {
+                    type: 'line',
+                    x0: 5, y0: 0,
+                    x1: 5, y1: 10,
+                    line: {
+                        color: '#95a5a6',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+                // 横線（y=5）
+                {
+                    type: 'line',
+                    x0: 0, y0: 5,
+                    x1: 10, y1: 5,
+                    line: {
+                        color: '#95a5a6',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+                // 第1象限の背景（右上）
+                {
+                    type: 'rect',
+                    x0: 5, y0: 5,
+                    x1: 10, y1: 10,
+                    fillcolor: '#27ae60',
+                    opacity: 0.05,
+                    line: {width: 0}
+                },
+                // 第2象限の背景（左上）
+                {
+                    type: 'rect',
+                    x0: 0, y0: 5,
+                    x1: 5, y1: 10,
+                    fillcolor: '#f39c12',
+                    opacity: 0.05,
+                    line: {width: 0}
+                },
+                // 第3象限の背景（左下）
+                {
+                    type: 'rect',
+                    x0: 0, y0: 0,
+                    x1: 5, y1: 5,
+                    fillcolor: '#e74c3c',
+                    opacity: 0.05,
+                    line: {width: 0}
+                },
+                // 第4象限の背景（右下）
+                {
+                    type: 'rect',
+                    x0: 5, y0: 0,
+                    x1: 10, y1: 5,
+                    fillcolor: '#3498db',
+                    opacity: 0.05,
+                    line: {width: 0}
+                }
+            ],
+            annotations: [
+                // 象限ラベル
+                {
+                    text: 'スター技術',
+                    x: 7.5, y: 9.5,
+                    showarrow: false,
+                    font: {size: 12, color: '#27ae60', family: 'Arial Black'}
+                },
+                {
+                    text: '潜在的優良技術',
+                    x: 2.5, y: 9.5,
+                    showarrow: false,
+                    font: {size: 12, color: '#f39c12', family: 'Arial Black'}
+                },
+                {
+                    text: 'ニッチ技術',
+                    x: 2.5, y: 0.5,
+                    showarrow: false,
+                    font: {size: 12, color: '#e74c3c', family: 'Arial Black'}
+                },
+                {
+                    text: '過渡期技術',
+                    x: 7.5, y: 0.5,
+                    showarrow: false,
+                    font: {size: 12, color: '#3498db', family: 'Arial Black'}
+                }
+            ],
+            height: 600,
+            margin: {t: 20, r: 20, b: 60, l: 80},
+            hovermode: 'closest',
+            showlegend: false,
+            plot_bgcolor: '#fafafa',
+            paper_bgcolor: 'white'
+        };
+
+        const config = {
+            responsive: true,
+            displayModeBar: true,
+            modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'resetScale2d', 'toggleSpikelines'],
+            displaylogo: false
+        };
+
+        Plotly.newPlot('plotDiv', [trace], layout, config);
+    </script>
+</body>
+</html>

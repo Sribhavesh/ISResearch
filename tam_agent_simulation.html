@@ -344,296 +344,552 @@
     </div>
 
     <script>
-        // グローバル変数
+        // ========================================
+        // グローバル変数の定義
+        // ========================================
+
+        // agents: すべてのエージェント（個人）を格納する配列
+        // 各エージェントは技術を採用するかどうか独自に判断する個人を表します
         let agents = [];
+
+        // time: シミュレーションの経過時間（ステップ数）
+        // 1ステップは実世界の1日や1週間などに相当すると考えることができます
         let time = 0;
+
+        // isRunning: シミュレーションが実行中かどうかを管理するフラグ
+        // true = 実行中、false = 停止中
         let isRunning = false;
+
+        // adoptionHistory: 採用率の時系列データを保存する配列
+        // グラフ描画に使用されます
         let adoptionHistory = [];
+
+        // canvas: p5.jsのキャンバスオブジェクト
+        // エージェントの動きを描画する領域です
         let canvas;
-        
-        // パラメータ
+
+        // ========================================
+        // シミュレーション設定パラメータ
+        // ========================================
+
+        // NUM_AGENTS: シミュレーションに参加するエージェント（個人）の総数
+        // 多いほど現実的ですが、処理が重くなります
         const NUM_AGENTS = 400;
+
+        // CANVAS_WIDTH, CANVAS_HEIGHT: 描画領域のサイズ（ピクセル単位）
         const CANVAS_WIDTH = 780;
         const CANVAS_HEIGHT = 500;
         
-        // エージェントクラス
+        // ========================================
+        // Agentクラス：個々のエージェント（個人）を表現
+        // ========================================
+        // 各エージェントは独自の性格や判断基準を持ち、
+        // 周囲の影響を受けながら技術採用を決定します
         class Agent {
             constructor(x, y, id) {
+                // ========== 基本属性 ==========
+                // id: このエージェントの固有識別番号
                 this.id = id;
+
+                // x, y: キャンバス上の現在位置（座標）
                 this.x = x;
                 this.y = y;
+
+                // vx, vy: 移動速度（velocity）のx成分とy成分
+                // エージェントがランダムに動き回るために使用
                 this.vx = 0;
                 this.vy = 0;
-                
-                // TAMパラメータ（個人差）
-                this.puThreshold = random(20, 80);  // 有用性の閾値
-                this.peouThreshold = random(20, 80); // 使いやすさの閾値
-                this.innovativeness = random(0, 100); // 革新性
-                
-                // 状態: 0=未認知, 1=検討中, 2=採用, 3=拒否
+
+                // ========== TAMモデルのパラメータ（個人差を表現）==========
+
+                // puThreshold: Perceived Usefulness（知覚された有用性）の閾値
+                // この値が低い人ほど、少しの有用性でも技術を採用しやすい
+                // random(20, 80)で20〜80の間のランダムな値を設定
+                this.puThreshold = random(20, 80);
+
+                // peouThreshold: Perceived Ease of Use（知覚された使いやすさ）の閾値
+                // この値が低い人ほど、使いにくい技術でも受け入れやすい
+                this.peouThreshold = random(20, 80);
+
+                // innovativeness: 革新性（イノベーティブさ）
+                // 0〜100の値で、高いほど新しい技術に積極的
+                // Rogers理論の「イノベーター」「アーリーアダプター」などに相当
+                this.innovativeness = random(0, 100);
+
+                // ========== エージェントの状態管理 ==========
+
+                // state: 現在の採用状態を表す数値
+                // 0 = 未認知（技術の存在を知らない）
+                // 1 = 検討中（技術を知って評価している）
+                // 2 = 採用（技術を使い始めた）
+                // 3 = 拒否（検討の結果、使わないことに決めた）
                 this.state = 0;
+
+                // considerationTime: 検討を始めてからの経過時間
+                // 人は即座に決定せず、時間をかけて検討します
                 this.considerationTime = 0;
+
+                // maxConsiderationTime: 検討にかける最大時間
+                // この時間が経過したら採用か拒否かを決定
+                // 10〜50ステップの間でランダムに設定（個人差）
                 this.maxConsiderationTime = random(10, 50);
-                
-                // ネットワーク
+
+                // ========== ソーシャルネットワーク ==========
+
+                // neighbors: 近くにいる他のエージェントのリスト
+                // 社会的影響を計算するために使用
                 this.neighbors = [];
+
+                // influenceRadius: 影響を与える/受ける範囲（半径）
+                // この範囲内にいる他者から社会的影響を受けます
                 this.influenceRadius = 50;
             }
             
+            // ========================================
+            // update: エージェントの状態を更新するメインメソッド
+            // ========================================
+            // 毎フレーム呼ばれ、エージェントの移動と意思決定を処理します
             update(techPU, techPEOU, socialInfluence) {
-                // 移動（ランダムウォーク）
+                // techPU: 技術の有用性（0-100）
+                // techPEOU: 技術の使いやすさ（0-100）
+                // socialInfluence: 社会的影響の強さ（0-100）
+
+                // ========== 1. エージェントの移動処理 ==========
+                // ランダムウォーク：現実世界での人の移動を模擬
+
+                // 速度にランダムな加速度を追加（-0.5〜0.5の範囲）
+                // これにより予測不可能な自然な動きを実現
                 this.vx += random(-0.5, 0.5);
                 this.vy += random(-0.5, 0.5);
-                this.vx *= 0.95; // 減衰
+
+                // 速度に減衰をかける（0.95を掛ける）
+                // これがないと無限に加速してしまうため
+                this.vx *= 0.95;
                 this.vy *= 0.95;
-                
+
+                // 速度を位置に反映（実際の移動）
                 this.x += this.vx;
                 this.y += this.vy;
-                
-                // 境界処理
-                if (this.x < 10) this.x = 10;
-                if (this.x > CANVAS_WIDTH - 10) this.x = CANVAS_WIDTH - 10;
-                if (this.y < 10) this.y = 10;
-                if (this.y > CANVAS_HEIGHT - 10) this.y = CANVAS_HEIGHT - 10;
-                
-                // 近隣エージェントの検出
+
+                // ========== 2. 境界処理（壁の実装）==========
+                // エージェントがキャンバスの外に出ないように制限
+                if (this.x < 10) this.x = 10;                           // 左端
+                if (this.x > CANVAS_WIDTH - 10) this.x = CANVAS_WIDTH - 10;  // 右端
+                if (this.y < 10) this.y = 10;                           // 上端
+                if (this.y > CANVAS_HEIGHT - 10) this.y = CANVAS_HEIGHT - 10; // 下端
+
+                // ========== 3. 社会的ネットワークの更新 ==========
+                // 近くにいる他のエージェントを検出
                 this.findNeighbors();
-                
-                // 状態遷移ロジック
-                if (this.state === 0) { // 未認知
-                    // 近隣に採用者がいれば認知
+
+                // ========== 4. 状態遷移ロジック（意思決定の中核）==========
+
+                if (this.state === 0) { // 【未認知状態】の処理
+                    // まだ技術の存在を知らない状態
+
+                    // 近隣の採用者数をカウント
+                    // filter: 条件に合うエージェントだけを抽出
+                    // a.state === 2: 採用済みのエージェント
                     let adoptedNeighbors = this.neighbors.filter(a => a.state === 2).length;
+
+                    // 認知のきっかけ：
+                    // 1. 近くに採用者がいる（口コミ効果）
+                    // 2. またはランダムに認知（広告などを想定、0.5%の確率）
                     if (adoptedNeighbors > 0 || random(100) < 0.5) {
-                        this.state = 1; // 検討中へ
+                        this.state = 1; // 検討中状態へ移行
                     }
-                } else if (this.state === 1) { // 検討中
+
+                } else if (this.state === 1) { // 【検討中状態】の処理
+                    // 技術を知って、採用するか検討している状態
+
+                    // 検討時間をカウントアップ
                     this.considerationTime++;
-                    
-                    // TAMに基づく採用決定
-                    let perceivedPU = techPU;
-                    let perceivedPEOU = techPEOU;
-                    
-                    // 社会的影響の反映
+
+                    // ========== TAMモデルに基づく評価計算 ==========
+
+                    // 基本的な知覚値（スライダーで設定された値）
+                    let perceivedPU = techPU;     // 知覚された有用性
+                    let perceivedPEOU = techPEOU; // 知覚された使いやすさ
+
+                    // ========== 社会的影響の計算 ==========
+                    // 周囲の採用者の割合から影響を受ける
+
+                    // 近隣の採用者数を再度カウント
                     let adoptedNeighbors = this.neighbors.filter(a => a.state === 2).length;
+
+                    // 採用者の割合を計算（0〜1の値）
+                    // max(this.neighbors.length, 1): ゼロ除算を防ぐ
                     let neighborInfluence = (adoptedNeighbors / max(this.neighbors.length, 1)) * socialInfluence;
-                    
-                    // ネットワーク効果
-                    perceivedPU += neighborInfluence * 0.5;
-                    perceivedPEOU += neighborInfluence * 0.3;
-                    
-                    // 採用意図の計算（TAMモデル）
+
+                    // ========== ネットワーク効果の適用 ==========
+                    // 周囲に採用者が多いほど、技術がより有用で使いやすく感じる
+                    perceivedPU += neighborInfluence * 0.5;   // 有用性は50%影響を受ける
+                    perceivedPEOU += neighborInfluence * 0.3; // 使いやすさは30%影響を受ける
+
+                    // ========== 採用意図の計算（TAMモデルの中核）==========
+                    // 採用意図 = 有用性×60% + 使いやすさ×40%
+                    // さらに個人の革新性で調整（革新的な人ほど採用しやすい）
                     let intention = (perceivedPU * 0.6 + perceivedPEOU * 0.4) * (1 + this.innovativeness / 200);
-                    
+
+                    // ========== 最終的な意思決定 ==========
+                    // 十分な検討時間が経過したら決定を下す
                     if (this.considerationTime > this.maxConsiderationTime) {
+                        // 採用意図が個人の閾値を超えたら採用、そうでなければ拒否
                         if (intention > (this.puThreshold * 0.6 + this.peouThreshold * 0.4)) {
-                            this.state = 2; // 採用
+                            this.state = 2; // 採用！
                         } else {
                             this.state = 3; // 拒否
                         }
                     }
                 }
+                // 注：採用（state=2）や拒否（state=3）になったら、その状態は変わらない
             }
             
+            // ========================================
+            // findNeighbors: 近隣エージェントを検出
+            // ========================================
+            // 社会的影響を計算するため、影響範囲内の他者を特定します
             findNeighbors() {
+                // filter関数で条件に合うエージェントだけを抽出
                 this.neighbors = agents.filter(a => {
+                    // 自分自身は除外（自分で自分に影響しない）
                     if (a === this) return false;
+
+                    // dist関数：2点間の距離を計算（p5.jsの関数）
+                    // √((x2-x1)² + (y2-y1)²) を計算
                     let d = dist(this.x, this.y, a.x, a.y);
+
+                    // 影響範囲内（influenceRadius以内）にいるかチェック
                     return d < this.influenceRadius;
                 });
             }
             
+            // ========================================
+            // display: エージェントを画面に描画
+            // ========================================
+            // 視覚的にエージェントの状態を表現します
             display() {
+                // push()とpop()：描画設定を一時的に保存・復元
+                // 他の描画に影響を与えないようにする
                 push();
-                
-                // 影響範囲の表示（採用者のみ）
+
+                // ========== 影響範囲の可視化 ==========
+                // 採用者のみ、その影響範囲を薄い青い円で表示
                 if (this.state === 2) {
-                    noStroke();
-                    fill(65, 105, 225, 30);
+                    noStroke();                    // 枠線なし
+                    fill(65, 105, 225, 30);       // 青色、透明度30（薄い青）
+                    // 直径は影響半径の2倍（circle関数は直径を指定）
                     circle(this.x, this.y, this.influenceRadius * 2);
                 }
-                
-                // エージェントの表示
-                let col;
-                let size = 8;
-                
+
+                // ========== エージェント本体の描画設定 ==========
+                let col;      // 色を格納する変数
+                let size = 8; // デフォルトサイズ
+
+                // 状態に応じて色とサイズを決定
                 switch(this.state) {
-                    case 0: col = color(211, 211, 211); break; // 未認知：グレー
-                    case 1: col = color(255, 215, 0); size = 10; break; // 検討中：黄色
-                    case 2: col = color(65, 105, 225); size = 12; break; // 採用：青
-                    case 3: col = color(255, 107, 107); size = 6; break; // 拒否：赤
+                    case 0: // 未認知
+                        col = color(211, 211, 211);  // グレー（知らない状態を表現）
+                        break;
+                    case 1: // 検討中
+                        col = color(255, 215, 0);     // 黄色（考えている状態を表現）
+                        size = 10;                    // 少し大きく（注目している）
+                        break;
+                    case 2: // 採用
+                        col = color(65, 105, 225);    // 青（採用済みを表現）
+                        size = 12;                    // 大きく（重要な存在）
+                        break;
+                    case 3: // 拒否
+                        col = color(255, 107, 107);   // 赤（拒否を表現）
+                        size = 6;                     // 小さく（関心を失った）
+                        break;
                 }
-                
-                // イノベーターは特別な色
+
+                // ========== イノベーターの特別表示 ==========
+                // 革新性が90以上かつ採用済みの人は「イノベーター」として緑色で表示
                 if (this.innovativeness > 90 && this.state === 2) {
-                    col = color(144, 238, 144); // 緑
-                    size = 14;
+                    col = color(144, 238, 144); // ライトグリーン
+                    size = 14;                  // 最大サイズ（影響力が大きい）
                 }
-                
-                stroke(255, 100);
-                strokeWeight(2);
-                fill(col);
-                circle(this.x, this.y, size);
-                
-                // ネットワーク接続の可視化
+
+                // ========== エージェント本体を描画 ==========
+                stroke(255, 100);      // 白い枠線（透明度100）
+                strokeWeight(2);       // 枠線の太さ2ピクセル
+                fill(col);            // 塗りつぶし色を設定
+                circle(this.x, this.y, size); // 円を描画
+
+                // ========== ネットワーク接続線の描画 ==========
+                // 採用者同士のつながりを線で可視化
                 if (this.state === 2) {
-                    stroke(65, 105, 225, 50);
-                    strokeWeight(1);
+                    stroke(65, 105, 225, 50);  // 薄い青色の線
+                    strokeWeight(1);           // 細い線
+
+                    // forEach：各近隣エージェントに対して処理
                     this.neighbors.forEach(n => {
+                        // 相手も採用者なら線を引く
                         if (n.state === 2) {
                             line(this.x, this.y, n.x, n.y);
                         }
                     });
                 }
-                
-                pop();
+
+                pop(); // 描画設定を元に戻す
             }
         }
         
-        // p5.js関数
+        // ========================================
+        // setup: p5.jsの初期化関数
+        // ========================================
+        // プログラム開始時に一度だけ実行される特別な関数
         function setup() {
+            // キャンバス（描画領域）を作成
+            // createCanvasはp5.jsの関数で、指定サイズの描画領域を作る
             canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            // キャンバスをHTML内の特定の要素に配置
+            // 'canvasContainer'というIDを持つdiv要素の中に入れる
             canvas.parent('canvasContainer');
-            
+
+            // シミュレーションの初期化（エージェントを作成など）
             initializeSimulation();
+
+            // スライダーのイベントリスナーを設定
+            // ユーザーがスライダーを動かしたときの処理を登録
             setupSliderListeners();
+
+            // グラフの初期化（Plotly.jsを使用）
             initializeCharts();
         }
         
+        // ========================================
+        // draw: p5.jsのメインループ関数
+        // ========================================
+        // 毎秒約60回自動的に呼ばれ、アニメーションを作成
         function draw() {
-            // 背景（グラデーション効果）
+            // ========== 背景のグラデーション描画 ==========
+            // 上から下に向かって色が変化する美しい背景を作成
             for(let i = 0; i <= CANVAS_HEIGHT; i++) {
+                // map関数：値を別の範囲に変換
+                // i（0〜CANVAS_HEIGHT）を0〜1の範囲に変換
                 let inter = map(i, 0, CANVAS_HEIGHT, 0, 1);
+
+                // lerpColor：2つの色の間を補間（ブレンド）
+                // 薄い青(240,248,255)から白(255,255,255)へ徐々に変化
                 let c = lerpColor(color(240, 248, 255), color(255, 255, 255), inter);
-                stroke(c);
-                line(0, i, CANVAS_WIDTH, i);
+
+                // 横線を引いて背景を塗る
+                stroke(c);                    // 線の色を設定
+                line(0, i, CANVAS_WIDTH, i);  // 左端から右端まで横線
             }
-            
-            // グリッド
-            stroke(200, 50);
-            strokeWeight(0.5);
+
+            // ========== グリッド（格子）の描画 ==========
+            // エージェントの位置を把握しやすくするための補助線
+            stroke(200, 50);      // グレー色、透明度50
+            strokeWeight(0.5);    // 細い線
+
+            // 縦線を50ピクセルごとに描画
             for(let x = 0; x < CANVAS_WIDTH; x += 50) {
                 line(x, 0, x, CANVAS_HEIGHT);
             }
+
+            // 横線を50ピクセルごとに描画
             for(let y = 0; y < CANVAS_HEIGHT; y += 50) {
                 line(0, y, CANVAS_WIDTH, y);
             }
             
-            if (isRunning) {
-                // パラメータ取得
+            // ========== シミュレーション実行処理 ==========
+            if (isRunning) {  // シミュレーションが実行中の場合のみ
+
+                // ========== UIからパラメータを取得 ==========
+                // HTMLのスライダーから現在の値を読み取る
+                // parseFloat：文字列を小数に変換
                 let techPU = parseFloat(document.getElementById('usefulness').value);
                 let techPEOU = parseFloat(document.getElementById('easeOfUse').value);
                 let socialInf = parseFloat(document.getElementById('socialInfluence').value);
-                
-                // エージェント更新
+
+                // ========== すべてのエージェントを更新 ==========
+                // forEach：配列の各要素に対して処理を実行
                 agents.forEach(agent => {
+                    // 各エージェントの状態を更新（移動と意思決定）
                     agent.update(techPU, techPEOU, socialInf);
                 });
-                
+
+                // 時間を1ステップ進める
                 time++;
-                
-                // 統計更新
+
+                // ========== 定期的な統計更新 ==========
+                // %（モジュロ）演算子：余りを計算
+                // time % 5 === 0 は「5ステップごと」を意味
                 if (time % 5 === 0) {
-                    updateStatistics();
-                    updateCharts();
+                    updateStatistics();  // 統計情報を更新
+                    updateCharts();      // グラフを更新
                 }
             }
             
-            // エージェント描画
+            // ========== すべてのエージェントを描画 ==========
+            // 実行中でなくても描画は行う（一時停止中も表示）
             agents.forEach(agent => {
                 agent.display();
             });
-            
-            // 時間表示
+
+            // ========== 経過時間をUIに表示 ==========
+            // HTMLの要素に現在の時間ステップを表示
             document.getElementById('timeStep').textContent = time;
         }
         
+        // ========================================
+        // initializeSimulation: シミュレーションを初期化
+        // ========================================
+        // リセット時や最初の起動時に呼ばれる
         function initializeSimulation() {
-            agents = [];
-            time = 0;
-            adoptionHistory = [];
-            
-            // エージェント生成
+            // ========== 変数をリセット ==========
+            agents = [];           // エージェント配列を空にする
+            time = 0;             // 時間を0に戻す
+            adoptionHistory = []; // 履歴データをクリア
+
+            // ========== エージェントを生成 ==========
             for(let i = 0; i < NUM_AGENTS; i++) {
+                // ランダムな位置を決定
+                // random(min, max)：min以上max未満のランダム値
+                // 端から20ピクセル内側に配置（端に行きすぎないように）
                 let x = random(20, CANVAS_WIDTH - 20);
                 let y = random(20, CANVAS_HEIGHT - 20);
+
+                // 新しいエージェントを作成して配列に追加
+                // push：配列の最後に要素を追加
                 agents.push(new Agent(x, y, i));
             }
-            
-            // イノベーター設定
+
+            // ========== イノベーター（初期採用者）の設定 ==========
+            // Rogers理論：最初から技術を採用している先駆者たち
+
+            // スライダーで設定された割合からイノベーター数を計算
+            // Math.floor：小数点以下を切り捨て
             let innovatorCount = Math.floor(NUM_AGENTS * parseFloat(document.getElementById('innovators').value) / 100);
+
+            // 最初のN人をイノベーターとして設定
             for(let i = 0; i < innovatorCount; i++) {
-                agents[i].state = 2; // 採用状態
-                agents[i].innovativeness = 95;
+                agents[i].state = 2;           // 最初から採用状態
+                agents[i].innovativeness = 95; // 高い革新性を持つ
             }
-            
+
+            // 初期状態の統計を計算
             updateStatistics();
         }
         
+        // ========================================
+        // updateStatistics: 統計情報を更新
+        // ========================================
+        // 現在の各状態のエージェント数を集計してUIに表示
         function updateStatistics() {
+            // ========== 各状態のエージェント数をカウント ==========
+            // filter：条件に合う要素だけを抽出
+            // length：配列の要素数を取得
+
+            // 採用者（state === 2）の数
             let adopters = agents.filter(a => a.state === 2).length;
+
+            // 検討中（state === 1）の数
             let considering = agents.filter(a => a.state === 1).length;
+
+            // 拒否者（state === 3）の数
             let rejected = agents.filter(a => a.state === 3).length;
-            
+
+            // ========== UIに表示 ==========
+            // 採用者数と割合
             document.getElementById('adopters').textContent = adopters;
-            document.getElementById('adoptersPercent').textContent = 
+            // toFixed(1)：小数第1位まで表示（例：45.3%）
+            document.getElementById('adoptersPercent').textContent =
                 `${(adopters / NUM_AGENTS * 100).toFixed(1)}%`;
-            
+
+            // 検討中の数と割合
             document.getElementById('considering').textContent = considering;
-            document.getElementById('consideringPercent').textContent = 
+            document.getElementById('consideringPercent').textContent =
                 `${(considering / NUM_AGENTS * 100).toFixed(1)}%`;
-            
-            // 履歴記録
+
+            // ========== 履歴データの記録 ==========
+            // グラフ描画用に時系列データを保存
             adoptionHistory.push({
-                time: time,
-                adopters: adopters,
-                considering: considering,
-                rejected: rejected,
+                time: time,                    // 現在の時刻
+                adopters: adopters,           // 採用者数
+                considering: considering,     // 検討中の数
+                rejected: rejected,           // 拒否者数
+                // 未認知者数は全体から他を引いて計算
                 unaware: NUM_AGENTS - adopters - considering - rejected
             });
         }
         
+        // ========================================
+        // setupSliderListeners: スライダーのイベント処理を設定
+        // ========================================
+        // ユーザーがスライダーを動かしたときに値の表示を更新
         function setupSliderListeners() {
-            // スライダーの値表示更新
+            // addEventListener：イベントが発生したときの処理を登録
+            // 'input'イベント：スライダーの値が変わるたびに発生
+
+            // ========== 技術の有用性スライダー ==========
             document.getElementById('usefulness').addEventListener('input', function(e) {
+                // e.target.value：スライダーの現在の値
+                // それを表示用の要素に反映
                 document.getElementById('usefulnessValue').textContent = e.target.value;
             });
-            
+
+            // ========== 技術の使いやすさスライダー ==========
             document.getElementById('easeOfUse').addEventListener('input', function(e) {
                 document.getElementById('easeOfUseValue').textContent = e.target.value;
             });
-            
+
+            // ========== 社会的影響力スライダー ==========
             document.getElementById('socialInfluence').addEventListener('input', function(e) {
                 document.getElementById('socialInfluenceValue').textContent = e.target.value;
             });
-            
+
+            // ========== イノベーター比率スライダー ==========
             document.getElementById('innovators').addEventListener('input', function(e) {
+                // %記号を追加して表示
                 document.getElementById('innovatorsValue').textContent = e.target.value + '%';
             });
         }
         
+        // ========================================
+        // シミュレーション制御関数
+        // ========================================
+
+        // startSimulation: シミュレーションを開始
+        // ボタンクリックで呼ばれる
         function startSimulation() {
-            isRunning = true;
+            isRunning = true;  // フラグをtrueにしてシミュレーション実行
         }
-        
+
+        // pauseSimulation: シミュレーションを一時停止
+        // 実行を止めるが、現在の状態は保持
         function pauseSimulation() {
-            isRunning = false;
+            isRunning = false; // フラグをfalseにして停止
         }
-        
+
+        // resetSimulation: シミュレーションをリセット
+        // すべてを初期状態に戻す
         function resetSimulation() {
-            isRunning = false;
-            initializeSimulation();
-            initializeCharts();
+            isRunning = false;           // まず停止
+            initializeSimulation();      // エージェントを再生成
+            initializeCharts();          // グラフもリセット
         }
         
+        // ========================================
+        // initializeCharts: グラフを初期化（Plotly.js使用）
+        // ========================================
+        // 2つのグラフ（時系列と円グラフ）を準備
         function initializeCharts() {
-            // 採用率推移チャート
+            // ========== 採用率推移チャート（折れ線グラフ）==========
+
+            // trace1: 採用者数の推移を表すデータ
             let trace1 = {
-                x: [0],
-                y: [0],
-                type: 'scatter',
-                mode: 'lines',
-                name: '採用者',
-                line: {color: '#4169E1', width: 3}
+                x: [0],                      // X軸データ（時間）、初期値0
+                y: [0],                      // Y軸データ（採用者数）、初期値0
+                type: 'scatter',             // 散布図タイプ（線でつなぐ）
+                mode: 'lines',               // 線のみ表示（点は表示しない）
+                name: '採用者',              // 凡例に表示される名前
+                line: {color: '#4169E1', width: 3}  // 青色、線の太さ3
             };
             
             let trace2 = {
@@ -656,13 +912,17 @@
             
             Plotly.newPlot('adoptionChart', [trace1, trace2], layout1, {displayModeBar: false});
             
-            // 分布チャート
+            // ========== 分布チャート（円グラフ）==========
+
+            // trace3: エージェントの状態分布を表す円グラフ
             let trace3 = {
-                values: [NUM_AGENTS, 0, 0, 0],
-                labels: ['未認知', '検討中', '採用', '拒否'],
-                type: 'pie',
+                values: [NUM_AGENTS, 0, 0, 0],  // 初期値：全員が未認知
+                labels: ['未認知', '検討中', '採用', '拒否'],  // 各セクションのラベル
+                type: 'pie',                    // 円グラフ
                 marker: {
+                    // 各状態の色（エージェント表示と同じ色を使用）
                     colors: ['#D3D3D3', '#FFD700', '#4169E1', '#FF6B6B']
+                    //        グレー     黄色       青        赤
                 }
             };
             
@@ -674,24 +934,43 @@
             Plotly.newPlot('distributionChart', [trace3], layout2, {displayModeBar: false});
         }
         
+        // ========================================
+        // updateCharts: グラフを更新
+        // ========================================
+        // 最新の統計データでグラフを再描画
         function updateCharts() {
+            // 履歴データが存在する場合のみ更新
             if (adoptionHistory.length > 0) {
+                // 最新のデータポイントを取得
+                // length - 1：配列の最後の要素のインデックス
                 let latest = adoptionHistory[adoptionHistory.length - 1];
-                
-                // 採用率推移の更新
+
+                // ========== 時系列グラフの更新 ==========
+
+                // map関数：配列の各要素を変換して新しい配列を作成
+                // 履歴から時間の配列を作成
                 let times = adoptionHistory.map(h => h.time);
+
+                // 履歴から採用者数の配列を作成
                 let adopters = adoptionHistory.map(h => h.adopters);
+
+                // 履歴から検討中数の配列を作成
                 let considering = adoptionHistory.map(h => h.considering);
-                
+
+                // Plotly.update：既存のグラフを更新（再描画より高速）
+                // 引数：(グラフID, 新データ, レイアウト変更, トレース番号)
                 Plotly.update('adoptionChart', {
-                    x: [times, times],
-                    y: [adopters, considering]
-                }, {}, [0, 1]);
-                
-                // 分布の更新
+                    x: [times, times],           // 両方のトレースに同じX軸データ
+                    y: [adopters, considering]   // それぞれのY軸データ
+                }, {}, [0, 1]);                 // トレース0と1を更新
+
+                // ========== 円グラフの更新 ==========
+
+                // 最新の状態分布で円グラフを更新
                 Plotly.update('distributionChart', {
+                    // 二重配列にする理由：Plotlyの仕様
                     values: [[latest.unaware, latest.considering, latest.adopters, latest.rejected]]
-                }, {}, [0]);
+                }, {}, [0]);  // トレース0（唯一のトレース）を更新
             }
         }
     </script>

